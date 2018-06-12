@@ -1,0 +1,11 @@
+---
+- name: Install kubeadm, kubectl
+  yum:
+    name: "{{ item }}-{{ kubernetes_version }}"
+    state: present
+  with_items:
+    - kubeadm
+    - kubectl
+
+- name: kubeadm init
+  shell: "kubeadm init  --kubernetes-version=v1.10.2 --feature-gates=CoreDNS=true --pod-network-cidr=192.168.0.0/16"

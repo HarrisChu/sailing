@@ -1,0 +1,11 @@
+---
+
+# install docker, and pull build-in images on every node
+-  hosts: k8s
+   roles:
+      - common
+      - docker
+
+-  hosts: all
+   roles:
+      - kubernetes

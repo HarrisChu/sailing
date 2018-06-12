@@ -1,0 +1,14 @@
+docker_buildin_images:
+  - kube-apiserver-amd64:v1.10.4
+  - kube-controller-manager-amd64:v1.10.4
+  - kube-scheduler-amd64:v1.10.4
+  - kube-proxy-amd64:v1.10.4
+  - etcd-amd64:3.1.12
+  - pause-amd64:3.1
+
+
+dockerhub_prefix: harrischu
+buildin_prefix: k8s.gcr.io
+
+
+docker_mirror: "https://ji6t6qcp.mirror.aliyuncs.com"

@@ -1,0 +1,58 @@
+---
+
+
+- name: Disable selinux
+  selinux:
+    state: disabled
+
+- name: turn off firewalld services
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: no
+  with_items:
+    - firewalld
+  ignore_errors: yes
+
+- name: change sysctl
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    state: present
+  ignore_errors: yes
+
+- name: Turning off swap 1.
+  shell: "swapoff -a"
+
+- name: Turning off swap 2.
+  lineinfile:
+    path: /etc/fstab
+    regexp: swap
+    state: absent
+
+- name: Add kubernetes repo
+  template:
+    src: kubernetes.repo.j2
+    dest: /etc/yum.repos.d/kubernetes.repo
+
+- name: Install kubelet
+    yum:
+    name: "{{ item }}-{{ kubernetes_version }}"
+    state: present
+  with_items:
+    - kubelet
+
+- name: Modify kubelet cgroup-driver
+  fileinline:
+    path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    regexp: cgroup-driver=systemd
+    line: cgroup-driver=cgroupfs
+
+- name: Enabel kubelet systemd
+  systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+    daemon-reload: yes
+  with_items:
+    - kubelet

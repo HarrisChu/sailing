@@ -1,0 +1,26 @@
+---
+# 在 ansible 使用 docker_image 前，需要安装 pydocker
+- name: Install openssl
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openssl
+    - python-setuptools
+
+- name: Install pip
+  shell: |
+    easy_install pip
+    pip install pyopenssl
+    pip install docker-py
+
+ #pull images from dockerhub, example harrischu/kube-apiserver-amd64:v1.10.4
+ #Then docker tag to the build-in images
+- name: Pull dockerhub images
+  docker_image:
+    name: "{{ dockerhub_prefix }}/{{ item }}"
+    repository: "{{ buildin_prefix }}/{{ item }}"
+  with_items:
+    - "{{ docker_buildin_images }}"
+
+

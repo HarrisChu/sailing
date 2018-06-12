@@ -1,0 +1,19 @@
+[all:vars]
+ansible_ssh_pass=3edc#EDC
+
+
+[k8s:children]
+master
+node
+etcd
+
+[master]
+kube-master-1 ansible_ssh_host=47.105.61.170 ip=172.31.245.245
+kube-master-2 ansible_ssh_host=47.105.44.8 ip=172.31.245.247
+kube-master-3 ansible_ssh_host=47.105.63.56 ip=172.31.245.246
+
+[etcd:children]
+master
+
+[node:children]
+master
