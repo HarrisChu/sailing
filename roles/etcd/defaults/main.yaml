@@ -1,0 +1,4 @@
+
+etcd_folder: /var/etcd
+etcd_version: "v3.1.12"
+etcd_need_copy: true

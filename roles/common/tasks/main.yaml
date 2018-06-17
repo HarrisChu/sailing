@@ -1,4 +1,7 @@
 ---
+- name: Change hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
 
 
 - name: Disable selinux
@@ -35,15 +38,16 @@
     src: kubernetes.repo.j2
     dest: /etc/yum.repos.d/kubernetes.repo
 
-- name: Install kubelet
-    yum:
+- name: Install kubelet, kubeadm
+  yum:
     name: "{{ item }}-{{ kubernetes_version }}"
     state: present
   with_items:
     - kubelet
+    - kubeadm
 
 - name: Modify kubelet cgroup-driver
-  fileinline:
+  lineinfile:
     path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
     regexp: cgroup-driver=systemd
     line: cgroup-driver=cgroupfs

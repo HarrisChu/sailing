@@ -1,0 +1,4 @@
+kubernetes_version: "1.10.4"
+docker_version: 17.03.1.ce
+
+VIP: 127.0.0.1

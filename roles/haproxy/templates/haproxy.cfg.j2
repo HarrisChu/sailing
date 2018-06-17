@@ -1,0 +1,35 @@
+###########全局配置#########
+global
+chroot /usr/local/etc/haproxy
+daemon
+nbproc 1
+group root
+user root
+pidfile /usr/local/etc/haproxy/haproxy.pid
+ulimit-n 65536
+#spread-checks 5m
+#stats timeout 5m
+#stats maxconn 100
+ 
+########默认配置############
+defaults
+mode tcp #默认的模式mode { tcp|http|health }，tcp是4层，http是7层，health只会返回OK
+retries 3 #两次连接失败就认为是服务器不可用，也可以通过后面设置
+option redispatch #当serverId对应的服务器挂掉后，强制定向到其他健康的服务器
+option abortonclose #当服务器负载很高的时候，自动结束掉当前队列处理比较久的链接
+maxconn 65535 #默认的最大连接数
+timeout connect 5000ms #连接超时
+timeout client 30000ms #客户端超时
+timeout server 30000ms #服务器超时
+#timeout check 2000 #心跳检测超时
+log 127.0.0.1 local0 err #[err warning info debug]
+ 
+########mysql代理配置#################
+listen apiserver
+bind 0.0.0.0:6443
+mode tcp # 4层代理
+balance roundrobin
+
+{% for host in groups['master'] %}
+server {{ host }} {{ hostvars[host]['ip'] }}:6443 weight 1 maxconn 60000 check inter 3s
+{% endfor %}

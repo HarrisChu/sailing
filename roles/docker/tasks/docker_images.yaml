@@ -24,3 +24,10 @@
     - "{{ docker_buildin_images }}"
 
 
+- name: Pull network images
+  docker_image:
+    name: "{{ dockerhub_prefix }}/{{ item }}"
+    repository: "{{ network_prefix }}/{{ item }}"
+  with_items:
+    - "{{ docker_network_images }}"
+

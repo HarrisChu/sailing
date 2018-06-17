@@ -1,0 +1,4 @@
+*.retry
+.git
+.idea
+__pycache__

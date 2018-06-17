@@ -1,3 +1,14 @@
+# ide
 .idea
+.vscode
+
+# python cache
 venv
+__pycache__
+
+# ansible
 *.retry
+inventory
+fetch
+ansible.log
+log

@@ -7,5 +7,78 @@
     - kubeadm
     - kubectl
 
-- name: kubeadm init
-  shell: "kubeadm init  --kubernetes-version=v1.10.2 --feature-gates=CoreDNS=true --pod-network-cidr=192.168.0.0/16"
+- name: Create folder
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /var/kubeadm
+    - /etc/kubernetes/pki
+    - /root/.kube/
+
+- name: Copy kubeadm config file
+  template:
+    src: kubeadm_config.yaml.j2
+    dest: /var/kubeadm/kubeadm_config.yaml
+
+- name: Kubeadm reset
+  shell: "kubeadm reset"
+
+- name: Kubeadm init master[0]
+  shell: "kubeadm init  --config=/var/kubeadm/kubeadm_config.yaml"
+  register: kubeadm_result
+  when: 
+    - ansible_hostname == groups['master']|first
+
+- name: Save kubeadm result key
+  copy:
+    content: "{{ kubeadm_result.stdout_lines[-1] }}"
+    dest: /var/kubeadm/result-key.txt
+  when: 
+    - ansible_hostname == groups['master']|first
+
+- name: Copy pki files
+  slurp:
+    src: "{{ item }}"
+  with_items:
+    - "/etc/kubernetes/pki/apiserver.crt"
+    - "/etc/kubernetes/pki/apiserver.key"
+    - "/etc/kubernetes/pki/apiserver-kubelet-client.crt"
+    - "/etc/kubernetes/pki/apiserver-kubelet-client.key"
+    - "/etc/kubernetes/pki/ca.crt"
+    - "/etc/kubernetes/pki/ca.key"
+    - "/etc/kubernetes/pki/front-proxy-ca.crt"
+    - "/etc/kubernetes/pki/front-proxy-ca.key"
+    - "/etc/kubernetes/pki/front-proxy-client.crt"
+    - "/etc/kubernetes/pki/front-proxy-client.key"
+    - "/etc/kubernetes/pki/sa.key"
+    - "/etc/kubernetes/pki/sa.pub"
+  register: kubeadm_certs
+  delegate_to: "{{ groups['master']|first }}"
+
+
+- name: Write out kubeadm certs
+  copy:
+    dest: "{{ item.item }}"
+    content: "{{ item['content'] | b64decode }}"
+    mode: 0600
+  # no_log: true
+  with_items: "{{ kubeadm_certs.results }}"
+  when: ansible_hostname != groups['master']|first
+
+
+- name: Kubeadm init other master
+  shell: "kubeadm init  --config=/var/kubeadm/kubeadm_config.yaml"
+  when: ansible_hostname != groups['master']|first
+
+- name: Copy kubeconf
+  shell: "cp /etc/kubernetes/admin.conf /root/.kube/config"
+
+- name: Install flannel
+  shell: "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml"
+  delegate_to: "{{ groups['master']|first }}"
+
+
+- name: Untainted master
+  shell: "kubectl taint nodes --all node-role.kubernetes.io/master-"
+  delegate_to: "{{ groups['master']|first }}"

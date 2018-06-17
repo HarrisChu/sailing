@@ -6,9 +6,12 @@ docker_buildin_images:
   - etcd-amd64:3.1.12
   - pause-amd64:3.1
 
+docker_network_images:
+  - flannel:v0.10.0-amd64
 
 dockerhub_prefix: harrischu
+network_prefix: quay.io/coreos
 buildin_prefix: k8s.gcr.io
 
 
-docker_mirror: "https://ji6t6qcp.mirror.aliyuncs.com"
+docker_mirror: '"https://ji6t6qcp.mirror.aliyuncs.com"'

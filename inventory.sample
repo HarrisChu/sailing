@@ -1,0 +1,24 @@
+[all:vars]
+ansible_ssh_pass=abcd1234
+
+
+[k8s:children]
+master
+node
+etcd
+
+[master]
+# ip 是内网 ip
+master-3 ansible_ssh_host=47.104.238.113 ip=172.31.245.247
+master-2 ansible_ssh_host=47.104.229.239 ip=172.31.245.246
+master-1 ansible_ssh_host=47.104.131.73 ip=172.31.245.245
+
+[etcd:children]
+master
+
+[node:children]
+master
+
+[haproxy]
+haproxy-1 ansible_ssh_host=47.105.108.199 ip=172.31.245.248
+

@@ -1,0 +1,17 @@
+---
+- name: Create haproxy folder
+  file:
+    path: /var/haproxy
+    state: directory
+
+- name: Copy haproxy.cfg
+  template: 
+    src: haproxy.cfg.j2
+    dest: /var/haproxy/haproxy.cfg
+
+- name: Run docker container
+  shell: |
+    docker run --name haproxy -e LANG=en_US.UTF-8 \
+        -v /var/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg \
+        --restart=always --net host -d haproxy:latest
+    

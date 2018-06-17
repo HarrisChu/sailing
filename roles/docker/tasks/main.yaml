@@ -26,7 +26,7 @@
   systemd:
     name: docker
     enabled: true
-    state: started
+    state: restarted
     daemon-reload: yes
 
 

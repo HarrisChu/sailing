@@ -1,27 +1,61 @@
+# Sailing
 
-## 功能
+## 目的
 
-* Install Docker 17.03
-* Install kubeadm, kubelet and kubectl
-* Make sure the cgroup driver used by kubelet is the same as the one used by docker
-* Pull build-in images on every node
-* Kubeadmin init
-* Install a pod network. (use Flannel)
-* Install plugins
-    * Cluster DNS server
+在阿里云上部署高可用的 Kubernetes 1.10.4。
+
+## 主要功能
+
+* 因为阿里云的 SLB，不支持 ECS 即作为 Real Server， 又作为客户端向 SLB 发送请求。单独在集群外的机器部署了 Haproxy。
+* 添加了阿里云的 YUM repo，可以用 yum 安装 Kubernetes。
+* 同步了 Kubernetes 需要的镜像到 Dockerhub，docker pull 后再改回原来的 tag，可以不需要翻墙下载镜像。
+* 同样，同步了 flannel 的镜像。
+* 在 master 上安装了 etcd 集群。 （非 TLS）
+* 用 kubeadm 安装 Kubernetes HA。
+
+## 准备
+
+* 4 台阿里云机器，1台放 Haproxy，剩下 3 台机器部署 Kubernetes。
+* 配置阿里云的 SLB，6443 端口指向 Haproxy 机器的 6443 端口
+* (推荐) 安装 Docker，通过 Docker 部署
+
+## 安装集群
+
+### Docker 部署集群
+
+```sh
+git clone https://github.com/HarrisChu/sailing.git
+cd sailing
+cp inventory.sample inventory
+# vim inventory 修改 ssh 登录密码和机器信息
+
+# vim env 修改 VIP 地址
+make run
+
+```
+
+正常情况下，5分钟之内就会部署完毕
+
+### 本地 ansible 部署
+
+```sh
+git clone https://github.com/HarrisChu/sailing.git
+cd sailing
+pipenv --python 3.6
+pipenv install
+
+cp inventory.sample inventory
+# vim inventory 修改 ssh 登录密码和机器信息
+
+# vim env 修改 VIP 地址
+pipenv run ansible-playbook -i inventory -e @env site.yaml -f 10
+```
+
+## 待完善
+
+* 常用插件
     * Dashboard
-    * EFK (optional)
-    * heapster & grafana (optional)
 
-* SSH access for master nodes
-* HA etcd cluster (using master)
-
-590942
-
-
-
-[dockerrepo]name=Docker Repository
-baseurl=https://mirrors.tuna.tsinghua.edu.cn/docker/yum/repo/centos7
-enabled=1
-gpgcheck=1
-gpgkey=https://mirrors.tuna.tsinghua.edu.cn/docker/yum/gpg 
+* 安装 helm
+* 部署的集群，自带一个 demo 服务
+* 部署的集群，自带一个 ingress 和 ingress controller

@@ -1,0 +1,45 @@
+---
+- name: Make ectd dir
+  file:
+    path: "{{ etcd_folder }}"
+    state: directory
+
+- name: Create env file
+  file:
+    path: /etc/etcd.env
+    state: touch
+
+- name: Copy etcd binaries
+  unarchive:
+    src: "etcd-{{ etcd_version }}-linux-amd64.tar.gz"
+    dest: "{{ etcd_folder }}"
+  when: etcd_need_copy
+
+- name: Link etcd folder
+  file:
+    src: "{{ etcd_folder }}/etcd-{{ etcd_version }}-linux-amd64"
+    state: link
+    dest: "{{ etcd_folder }}/etcd"
+
+- name: Remove etcd commond
+  file:
+    dest: "/usr/local/bin/{{ item }}"
+    state: absent
+
+  with_items:
+    - etcd
+    - etcdctl
+
+- name: Link etcd commond
+  file:
+    src: "{{ etcd_folder }}/etcd/{{ item }}"
+    state: link
+    dest: "/usr/local/bin/{{ item }}"
+    mode: "+x"
+
+  with_items:
+    - etcd
+    - etcdctl
+
+- name: etcd systemd config
+  include_tasks: etcd_systemd.yaml

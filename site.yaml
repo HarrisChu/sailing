@@ -1,11 +1,33 @@
 ---
-
 # install docker, and pull build-in images on every node
--  hosts: k8s
+-  hosts: all
    roles:
       - common
-      - docker
+   tags:
+      - common
 
 -  hosts: all
    roles:
-      - kubernetes
+      - docker
+   tags:
+      - docker
+
+-  hosts: etcd
+   roles:
+      - etcd
+   tags:
+      - etcd
+
+-  hosts: haproxy
+   roles:
+      - haproxy
+   tags:
+      - haproxy
+
+
+-  hosts: master
+   roles:
+      - master
+   tags:
+      - master
+

@@ -1,0 +1,19 @@
+---
+
+- hosts: all
+  tasks:
+    - name: debug groups
+      debug:
+        msg: "{{ groups['master'] }}"
+
+    - name: debug when statement
+      debug: "{{ ansible_hostname }}"
+      when: 
+        - ansible_hostname != groups['master']|first
+
+- hosts: all
+  tasks: 
+    - name: test
+      debug:
+        msg: "{{ VIP }}"
+    
