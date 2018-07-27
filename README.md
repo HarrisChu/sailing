@@ -15,7 +15,6 @@
 
 ## 准备
 
-
 * 4 台阿里云机器，1台放 Haproxy，剩下 3 台机器部署 Kubernetes，操作系统 Centos 7.4.
 * 配置阿里云的 SLB，6443 端口指向 Haproxy 机器的 6443 端口。
 * (推荐) 安装 Docker，通过 Docker 部署。
@@ -69,6 +68,18 @@ pipenv run ansible-playbook -i inventory -e @env site.yaml -f 10
 `kubectl get pods --all-namespaces` 查看所有的 pods
 
 可以看到虽然 master1 不可用了，但是 apiserver 还是正常的。
+
+* 部署 nginx
+
+复制 `example` 中的 yaml 到服务器上，分别执行：
+
+`kubectl apply -f nginx-deploy.yaml`
+
+`kubectl apply -f nginx-svc.yaml`
+
+会创建一个 nginx 的服务，并且通过 nodePort 透传。
+
+`curl localhost:30080` 就可以看到成功访问到 nginx 的页面了。
 
 ## 待完善
 
