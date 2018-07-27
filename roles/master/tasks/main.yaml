@@ -76,9 +76,8 @@
 
 - name: Install flannel
   shell: "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml"
-  delegate_to: "{{ groups['master']|first }}"
-
+  when: ansible_hostname == groups['master']|first
 
 - name: Untainted master
   shell: "kubectl taint nodes --all node-role.kubernetes.io/master-"
-  delegate_to: "{{ groups['master']|first }}"
+  when: ansible_hostname == groups['master']|first
