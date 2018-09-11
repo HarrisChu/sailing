@@ -21,8 +21,8 @@
     src: kubeadm_config.yaml.j2
     dest: /var/kubeadm/kubeadm_config.yaml
 
-- name: Kubeadm reset
-  shell: "kubeadm reset"
+# - name: Kubeadm reset
+#   shell: "kubeadm reset"
 
 - name: Kubeadm init master[0]
   shell: "kubeadm init  --config=/var/kubeadm/kubeadm_config.yaml"

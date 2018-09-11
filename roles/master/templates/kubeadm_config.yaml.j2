@@ -1,6 +1,7 @@
 apiVersion: kubeadm.k8s.io/v1alpha1
 kind: MasterConfiguration
-kubernetesVersion: v1.10.4
+kubernetesVersion: v{{ kubernetes_version }}
+#imageRepository: registry.cn-hangzhou.aliyuncs.com/google_containers
 api:
   advertiseAddress: {{ VIP }}
   controlPlaneEndpoint: {{ VIP }}
